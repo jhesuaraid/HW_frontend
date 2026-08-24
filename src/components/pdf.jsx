@@ -560,8 +560,14 @@ export default function PdfLazyViewer({
                 formData.append("images", item.blob, `page${item.page}_rect${item.index}.png`);
             });
 
-            const rawHost = import.meta.env.VITE_PUBLIC_HOST || `https://${window.location.hostname}`;
-            const activeHost = rawHost.replace(/localhost|127\.0\.0\.1/, window.location.hostname).replace(/\/$/, "");
+            // Determinar host del backend de forma segura para desarrollo (localhost) y producción (HTTPS / Vercel)
+            let activeHost = import.meta.env.VITE_PUBLIC_HOST || import.meta.env.VITE_API_URL;
+            if (!activeHost) {
+                const isLocal = typeof window !== "undefined" && 
+                    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+                activeHost = isLocal ? "http://127.0.0.1:8000" : (typeof window !== "undefined" ? window.location.origin : "");
+            }
+            activeHost = activeHost.replace(/\/$/, "");
 
             const res = await fetch(`${activeHost}/test/TestView/`, {
                 method: "POST",
