@@ -560,7 +560,7 @@ export default function PdfLazyViewer({
                 formData.append("images", item.blob, `page${item.page}_rect${item.index}.png`);
             });
 
-            const rawHost = import.meta.env.VITE_PUBLIC_HOST || `http://${window.location.hostname}:8000`;
+            const rawHost = import.meta.env.VITE_PUBLIC_HOST || `https://${window.location.hostname}`;
             const activeHost = rawHost.replace(/localhost|127\.0\.0\.1/, window.location.hostname).replace(/\/$/, "");
 
             const res = await fetch(`${activeHost}/test/TestView/`, {
