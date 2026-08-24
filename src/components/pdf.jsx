@@ -574,7 +574,14 @@ export default function PdfLazyViewer({
                 body: formData,
             });
 
-            if (!res.ok) throw new Error("Error sending images");
+            if (!res.ok) {
+                throw new Error(`Server error ${res.status}: ${res.statusText}`);
+            }
+
+            const contentType = res.headers.get("content-type") || "";
+            if (contentType.includes("text/html")) {
+                throw new Error("Backend server not configured or unreachable at this endpoint.");
+            }
 
             const blob = await res.blob();
 
@@ -595,8 +602,9 @@ export default function PdfLazyViewer({
             showToast('Document exported successfully', 'success');
         } catch (err) {
             console.error('Error sending images to backend:', err);
-            setError('Error sending images to server. Please try again.');
-            showToast('Error exporting document', 'error');
+            const msg = err.message || 'Error sending images to server.';
+            setError(msg);
+            showToast(msg, 'error');
         } finally {
             setIsSending(false);
         }
