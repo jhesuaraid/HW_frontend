@@ -1,5 +1,6 @@
 import './output.css';
 import Pdf_show from './app/pdf_show';
+import MSecreto from './app/msecreto';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Pdf_show />} />
         <Route path="/pdf_show" element={<Pdf_show />} />
+        <Route path="/msecreto" element={<MSecreto />} />
         <Route path="*" element={<Pdf_show />} />
       </Routes>
     </BrowserRouter>
