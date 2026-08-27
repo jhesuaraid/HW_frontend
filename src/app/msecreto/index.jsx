@@ -172,7 +172,7 @@ export default function MSecreto() {
                         <div className="w-full bg-slate-900 border-b border-slate-800 px-6 py-2 flex items-center justify-between z-30">
                             <div className="flex items-center gap-3">
                                 <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-600 text-white rounded">
-                                    MODO SECRETO
+                                    Lector de pdf local
                                 </span>
                                 <span className="text-sm font-medium text-slate-300 truncate max-w-xs md:max-w-md">
                                     📄 {pdfFile?.name}
