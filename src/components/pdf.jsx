@@ -9,6 +9,9 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
+// ── Frontend-only DOCX generator (no backend needed) ──
+import { generateAndDownloadDocx } from "@/services/generateDocx";
+
 import PdfPage2 from './pdfPage2';
 
 
@@ -549,60 +552,27 @@ export default function PdfLazyViewer({
         }
     };
 
+    /**
+     * generateDocxLocally — Frontend-only DOCX generation (no backend required).
+     * Replicates the exact same document structure that the Django backend produced,
+     * but runs entirely in the browser using the `docx` JS library.
+     * Works offline.
+     */
     const sendImagesToBackend = async () => {
+        if (imagesToRender.length === 0) {
+            showToast("No images to export. Save a selection first.", 'warning');
+            return;
+        }
+
         setIsSending(true);
         setError(null);
 
         try {
-            const formData = new FormData();
-
-            imagesToRender.forEach((item, i) => {
-                formData.append("images", item.blob, `page${item.page}_rect${item.index}.png`);
-            });
-
-            // Determinar host del backend de forma segura para desarrollo (localhost) y producción (HTTPS / Vercel)
-            let activeHost = import.meta.env.VITE_PUBLIC_HOST || import.meta.env.VITE_API_URL;
-            if (!activeHost) {
-                const isLocal = typeof window !== "undefined" && 
-                    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
-                activeHost = isLocal ? "http://127.0.0.1:8000" : (typeof window !== "undefined" ? window.location.origin : "");
-            }
-            activeHost = activeHost.replace(/\/$/, "");
-
-            const res = await fetch(`${activeHost}/test/TestView/`, {
-                method: "POST",
-                body: formData,
-            });
-
-            if (!res.ok) {
-                throw new Error(`Server error ${res.status}: ${res.statusText}`);
-            }
-
-            const contentType = res.headers.get("content-type") || "";
-            if (contentType.includes("text/html")) {
-                throw new Error("Backend server not configured or unreachable at this endpoint.");
-            }
-
-            const blob = await res.blob();
-
-            // Crear URL temporal
-            const url = window.URL.createObjectURL(blob);
-
-            // Crear enlace de descarga
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = `${fileName}.docx`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-
-            // Liberar URL temporal
-            window.URL.revokeObjectURL(url);
-
-            showToast('Document exported successfully', 'success');
+            await generateAndDownloadDocx(imagesToRender, fileName || "document");
+            showToast('Document exported successfully (offline)', 'success');
         } catch (err) {
-            console.error('Error sending images to backend:', err);
-            const msg = err.message || 'Error sending images to server.';
+            console.error('Error generating DOCX locally:', err);
+            const msg = err.message || 'Error generating DOCX file.';
             setError(msg);
             showToast(msg, 'error');
         } finally {
