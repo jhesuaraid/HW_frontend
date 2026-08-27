@@ -4,7 +4,7 @@ import { UploadCloud, FileText, ArrowLeft, RefreshCw, ShieldCheck } from "lucide
 import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Vista Secreta (/msecreto)
+ * Vista Secreta (/pdf)
  * Permite al usuario cargar cualquier archivo PDF local personalizado
  * y utilizar todas las herramientas de edición, dibujo de cajas y exportación a Word.
  */
@@ -105,7 +105,7 @@ export default function MSecreto() {
                                     </div>
                                     <div>
                                         <h1 className="text-xl font-bold text-white tracking-wide">
-                                            Panel Privado (/msecreto)
+                                            Panel Privado (/pdf)
                                         </h1>
                                         <p className="text-xs text-slate-400">
                                             Carga tu propio PDF para edición y extracción
