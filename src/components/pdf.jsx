@@ -83,7 +83,6 @@ export default function PdfLazyViewer({
     const [spaceBetweenPages, setSpaceBetweenPages] = useState(32);
     const [totalSpaceBetweenPages, setTotalSpaceBetweenPages] = useState(0);
 
-    const [pageWithNumbers, setWithNumbers] = useState([]);
     const [selectedRectIndex, setSelectedRectIndex] = useState(-1);
 
     //Tools
@@ -93,6 +92,8 @@ export default function PdfLazyViewer({
     const [rotationGlobal, setRotationGlobal] = useState(0);
 
     const [rectangles, setRectangles] = useState(initialRectangles);
+    // Computed dynamically: pages that have at least one rectangle (updates live as rectangles change)
+    const pageWithNumbers = [...new Set(rectangles.map(r => r.page))].sort((a, b) => a - b);
     const [isDrawing, setIsDrawing] = useState(false);
     const [hoveredRectIndex, setHoveredRectIndex] = useState(-1);
     const startPoint = useRef({ x: 0, y: 0 });
@@ -431,8 +432,6 @@ export default function PdfLazyViewer({
                 return acc;
             }, {});
 
-            const pagesWithRects = Object.keys(groupedByPage).map(Number).sort((a, b) => a - b);
-            setWithNumbers(pagesWithRects);
             const allBlobs = [];
 
             for (const [pageNumStr, rects] of Object.entries(groupedByPage)) {
@@ -849,6 +848,12 @@ export default function PdfLazyViewer({
                                 }`} title="Rectangle">
                             <Square className="w-5 h-5 text-slate-700" />
                         </button>
+
+                        <button onClick={() => setSelectedTool("info")}
+                            className={`w-12 h-12 flex items-center justify-center rounded-xl transition ${selectedTool === "info" ? "bg-sky-100 border border-sky-400" : "hover:bg-slate-100"
+                                }`} title="Document Info">
+                            <FileText className="w-5 h-5 text-slate-700" />
+                        </button>
                        
                     </aside>
                     {/* Document Viewer */}
@@ -1066,8 +1071,33 @@ export default function PdfLazyViewer({
 
                                     {selectedTool === "info" && (
                                         <>
-                                            <label className="block text-slate-600 mb-1">Pages with rectangles</label>
-                                            {formatNumberRanges(pageWithNumbers)}
+                                            <label className="block text-slate-600 mb-2 font-medium">Pages with rectangles</label>
+                                            {pageWithNumbers.length === 0 ? (
+                                                <p className="text-slate-400 text-xs italic">No rectangles drawn yet.</p>
+                                            ) : (
+                                                <>
+                                                    <div className="flex flex-wrap gap-2 mb-3">
+                                                        {pageWithNumbers.map(pageNum => {
+                                                            const count = rectangles.filter(r => r.page === pageNum).length;
+                                                            return (
+                                                                <button
+                                                                    key={pageNum}
+                                                                    onClick={() => proceduralScrollToSection(pageNum)}
+                                                                    className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border transition ${currentPage === pageNum ? 'bg-sky-100 border-sky-400 text-sky-700' : 'bg-slate-100 border-slate-300 text-slate-600 hover:bg-sky-50 hover:border-sky-300'}`}
+                                                                    title={`Go to page ${pageNum}`}
+                                                                >
+                                                                    <span>p.{pageNum}</span>
+                                                                    <span className="bg-sky-500 text-white rounded-full px-1.5 py-0.5 text-[10px] leading-none">{count}</span>
+                                                                </button>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                    <p className="text-xs text-slate-500">
+                                                        <span className="font-medium text-slate-700">{rectangles.length}</span> rectangle{rectangles.length !== 1 ? 's' : ''} across pages:{' '}
+                                                        <span className="font-mono text-sky-700">{formatNumberRanges(pageWithNumbers)}</span>
+                                                    </p>
+                                                </>
+                                            )}
                                         </>
                                     )}
 
