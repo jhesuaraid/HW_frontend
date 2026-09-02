@@ -1,10 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SafeLang</title>
+    <meta name="theme-color" content="#0284c7" />
+    <meta name="description" content="PDF Editor Pro — Visualizador y editor de PDF con exportación a Word. Funciona 100% offline." />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>PDF Editor Pro</title>
+
+    <!-- Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            .register('/sw.js')
+            .then((reg) => console.log('[SW] Registered:', reg.scope))
+            .catch((err) => console.warn('[SW] Registration failed:', err));
+        });
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

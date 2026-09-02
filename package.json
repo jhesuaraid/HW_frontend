@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "docx": "^9.7.1",
     "driver.js": "^1.8.0",
     "framer-motion": "^13.1.1",
     "lucide-react": "^0.546.0",
